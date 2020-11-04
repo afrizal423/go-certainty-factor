@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"go_certainty_factor/config"
 	"go_certainty_factor/respon"
 	"log"
@@ -53,5 +55,27 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respon.GetAllData(w, getdt)
+
+}
+
+func HitungCF(w http.ResponseWriter, r *http.Request) {
+
+	dec := json.NewDecoder(r.Body)
+
+	// kita unmarshall bracket array dulu
+
+	dec.Token()
+
+	// kita buat perulangan untuk mendapatkan values
+	for dec.More() {
+		var GetData respon.GetHitung
+		// decode an array value (Message)
+		err := dec.Decode(&GetData)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// log.Print(GetData)
+		fmt.Printf("%v: %v\n", GetData.Kode_gejala, GetData.Persentase_user)
+	}
 
 }

@@ -32,6 +32,11 @@ type Penyakit struct {
 	// Nama_gejala Coba
 }
 
+type GetHitung struct {
+	Kode_gejala     string  `json:"kode_gejala"`
+	Persentase_user float32 `json:"persentase_user"`
+}
+
 func ErrorResponse(w http.ResponseWriter, status int, err error) {
 	w.WriteHeader(status)
 
