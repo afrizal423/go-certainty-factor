@@ -20,9 +20,6 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 	getdt := &respon.GetAll{}
 	getdt.Status = "Sukses"
 	getdt.Penyakitnya = make([]respon.Penyakit, 0)
-	// sql := `select spk_anemia_penyakit.kode_penyakit, spk_anemia_penyakit.nama_penyakit, spk_anemia_rule.bobotnya
-	// from spk_anemia_penyakit
-	// join spk_anemia_rule on spk_anemia_rule.Penyakitnya_id = spk_anemia_penyakit.id`
 	sql := `select spk_anemia_penyakit.kode_penyakit, spk_anemia_penyakit.nama_penyakit
 	from spk_anemia_penyakit `
 	// db.Select(&user, sql)
@@ -35,8 +32,7 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Panic(err)
 		}
-		// pnykt.Spk_anemia_rules = append(pnykt.Spk_anemia_rules, rulenya)
-		sql2 := `select spk_anemia_gejala_penyakit.nama_gejala
+		sql2 := `select spk_anemia_gejala_penyakit.nama_gejala, spk_anemia_gejala_penyakit.kode_gejala
 		from spk_anemia_penyakit
 		join spk_anemia_rule on spk_anemia_rule.Penyakitnya_id = spk_anemia_penyakit.id
 		join spk_anemia_gejala_penyakit on spk_anemia_rule.Gejalanya_id = spk_anemia_gejala_penyakit.id
@@ -47,21 +43,15 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 
 		for rows2.Next() {
 			rulenya := respon.Gejala{}
-			err2 = rows2.Scan(&rulenya.Gejala)
+			err2 = rows2.Scan(&rulenya.Gejala, &rulenya.Kode_gejala)
 			if err2 != nil {
 				log.Panic(err2)
 			}
-			// log.Println(rulenya)
 			pnykt.Gejalanya = append(pnykt.Gejalanya, rulenya)
 		}
-
-		// log.Println(pnykt.Kode_penyakit)
 		getdt.Penyakitnya = append(getdt.Penyakitnya, pnykt)
 	}
 
-	// log.Println("users...")
-	// log.Println(getdt)
 	respon.GetAllData(w, getdt)
-	// json.NewEncoder(w).Encode(getdt)
 
 }
