@@ -1,35 +1,14 @@
 package controller
 
 import (
-	"encoding/json"
 	"go_certainty_factor/config"
 	"go_certainty_factor/respon"
 	"log"
 	"net/http"
 )
 
-type GetAll struct {
-	Status      string
-	Penyakitnya []Penyakit
-}
-
-type Gejala struct {
-	// Id       int64  `db:"pId"`
-	Gejala string `db:"nama_gejala"`
-}
-
-type Penyakit struct {
-	// Id       int64  `db:"pId"`
-	Nama_penyakit string `db:"nama_penyakit"`
-	Kode_penyakit string `db:"kode_penyakit"`
-	Gejalanya     []Gejala
-	// Bobotnya string `db:"bobotnya"`
-	// Nama_gejala Coba
-}
-
 func ListPenyakit(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	db, err := config.CreateConnection()
 	defer db.Close()
 
@@ -38,9 +17,9 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getdt := &GetAll{}
-	getdt.Status = "sukses"
-	getdt.Penyakitnya = make([]Penyakit, 0)
+	getdt := &respon.GetAll{}
+	getdt.Status = "Sukses"
+	getdt.Penyakitnya = make([]respon.Penyakit, 0)
 	// sql := `select spk_anemia_penyakit.kode_penyakit, spk_anemia_penyakit.nama_penyakit, spk_anemia_rule.bobotnya
 	// from spk_anemia_penyakit
 	// join spk_anemia_rule on spk_anemia_rule.Penyakitnya_id = spk_anemia_penyakit.id`
@@ -50,7 +29,7 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Query(sql)
 
 	for rows.Next() {
-		pnykt := Penyakit{}
+		pnykt := respon.Penyakit{}
 		// rulenya := Spk_anemia_rule{}
 		err = rows.Scan(&pnykt.Kode_penyakit, &pnykt.Nama_penyakit)
 		if err != nil {
@@ -67,12 +46,12 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 		// log.Println(rows2, err2)
 
 		for rows2.Next() {
-			rulenya := Gejala{}
+			rulenya := respon.Gejala{}
 			err2 = rows2.Scan(&rulenya.Gejala)
 			if err2 != nil {
 				log.Panic(err2)
 			}
-			log.Println(rulenya)
+			// log.Println(rulenya)
 			pnykt.Gejalanya = append(pnykt.Gejalanya, rulenya)
 		}
 
@@ -82,7 +61,7 @@ func ListPenyakit(w http.ResponseWriter, r *http.Request) {
 
 	// log.Println("users...")
 	// log.Println(getdt)
-
-	json.NewEncoder(w).Encode(getdt)
+	respon.GetAllData(w, getdt)
+	// json.NewEncoder(w).Encode(getdt)
 
 }
