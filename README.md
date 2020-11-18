@@ -4,7 +4,7 @@
 
 # Expert System With Certainty Factor Using GoLang
 
-Sistem pendukung keputusan dengan certainty factor menggunakan GoLang database MySql. Sistem ini berbasis REST API, jadi untuk komunikasi data menggunakan JSON.
+Sistem pakar dengan certainty factor menggunakan GoLang database MySql. Sistem ini berbasis REST API, jadi untuk komunikasi data menggunakan JSON.
 
 ## Installation
 - Silahkan download/clone repository ini
