@@ -14,6 +14,7 @@ Sistem pendukung keputusan dengan certainty factor menggunakan GoLang database M
 
 ## NOTE!!!
 - Data yang didapat bukanlah data dari pakar untuk pembobotan MB (<i>measure of belief / ukuran kepercayaan</i>) maupun MD (<i> measure of disbelief / ukuran ketidakpercayaan</i>)
+- Data penyakit, rule dan gejala didapat dari [jurnal ini](https://prpm.trigunadharma.ac.id/public/fileJurnal/hpxu6%20-%20Trinanda.pdf)
 - Silahkan ubah data tersebut sesuai studi kasus masing-masing
 
 ## Input Output
@@ -87,7 +88,8 @@ Hasil perhitungan akan berupa JSON, seperti dibawah ini:
 
 * Bagi yang ingin berdonasi terbentuknya sistem ini, siapapun, berapapun, saya ucapkan terimakasih sebanyak-banyaknya. Via Gopay / Dana.
 
-Gopay
+### Gopay<br>
 <img src="img/gpy.png" height="400"> <br>
-Dana
+
+### Dana<br>
 <img src="img/dana.png" height="350">
