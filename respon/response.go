@@ -7,9 +7,9 @@ import (
 )
 
 type Response struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Status int         `json:"status"`
+	Pesan  string      `json:"pesan"`
+	Data   interface{} `json:"data"`
 }
 
 type GetAll struct {
@@ -18,19 +18,15 @@ type GetAll struct {
 }
 
 type Gejala struct {
-	// Id       int64  `db:"pId"`
 	Kode_gejala string  `db:"kode_gejala" json:"kode_gejala"`
 	Gejala      string  `db:"nama_gejala" json:"nama_gejala"`
 	MD          float32 `db:"md" json:"md"`
 }
 
 type Penyakit struct {
-	// Id       int64  `db:"pId"`
 	Nama_penyakit string   `db:"nama_penyakit" json:"nama_penyakit"`
 	Kode_penyakit string   `db:"kode_penyakit" json:"kode_penyakit"`
 	Gejalanya     []Gejala `json:"gejalanya"`
-	// Bobotnya string `db:"bobotnya"`
-	// Nama_gejala Coba
 }
 
 type GetHitung struct {
@@ -38,11 +34,16 @@ type GetHitung struct {
 	Persentase_user float32 `json:"persentase_user"`
 }
 
+type Hasil_hitung struct {
+	Nama_penyakit     string  `db:"nama_penyakit" json:"nama_penyakit"`
+	Hasil_perhitungan float32 `db:"hasil_perhitungan" json:"hasil_perhitungan"`
+}
+
 func ErrorResponse(w http.ResponseWriter, status int, err error) {
 	w.WriteHeader(status)
 
 	res := Response{
-		Message: err.Error(),
+		Pesan: err.Error(),
 	}
 
 	err = json.NewEncoder(w).Encode(res)
@@ -54,11 +55,12 @@ func ErrorResponse(w http.ResponseWriter, status int, err error) {
 
 func MessageResponse(w http.ResponseWriter, message string, data interface{}, status int) {
 	res := Response{
-		Status:  status,
-		Message: message,
-		Data:    data,
+		Status: status,
+		Pesan:  message,
+		Data:   data,
 	}
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(res)
 
 	if err != nil {

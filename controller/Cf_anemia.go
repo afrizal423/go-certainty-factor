@@ -83,7 +83,7 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 		dt_json = append(dt_json, GetData)
 		// fmt.Printf("%v: %v\n", GetData.Kode_gejala, GetData.Persentase_user)
 	}
-
+	var hasil_combine = make(map[string]float32)
 	// kita buat perulangan untuk mendapatkan values
 	rows, err := db.Query("select kode_penyakit, nama_penyakit from spk_anemia_penyakit")
 	iterasi := 0
@@ -103,7 +103,7 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 		rows2, err2 := db.Query(sql2, pnykt.Kode_penyakit)
 		iterasi2 := 0
 		fmt.Println(pnykt.Nama_penyakit)
-
+		fmt.Println("=====================================")
 		var kombin []float32
 		for rows2.Next() {
 			rulenya := respon.Gejala{}
@@ -125,13 +125,61 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 
 			iterasi2++
 		}
-		fmt.Println(kombin)
+		fmt.Println("============Hitung Kombin============")
+		var hasilcombin float32 = 0
+		for key, value := range kombin {
+			if key == 0 {
+				fmt.Printf("%v %v\n", key, value)
+				fmt.Println(kombin[key+1])
+				hasilcombin = kombin[key] + kombin[key+1]*(1.0-kombin[key])
+				// fmt.Printf("asd %v", hasilcombin)
+				if len(kombin)-1 == 1 {
+					// fmt.Println(pnykt.Nama_penyakit)
+					hasil_combine[pnykt.Nama_penyakit] = hasilcombin
+					fmt.Println("stop/last")
+					break
+				}
+			} else {
+				// fmt.Println(key + 1)
+				// fmt.Println(len(kombin))
+				if key+1 == len(kombin) {
+					// fmt.Println(pnykt.Nama_penyakit)
+					hasil_combine[pnykt.Nama_penyakit] = hasilcombin
+					fmt.Println("stop/last")
+					break
+				}
+				// if kombin[key+1] == 0 {
+				// 	break
+				// }
+				hasilcombin = hasilcombin + kombin[key+1]*(1.0-hasilcombin)
+				// fmt.Printf("asd %v", hasilcombin)
+			}
+		}
+		// fmt.Println(hasilcombin)
+		fmt.Println(len(kombin))
+		fmt.Println("=====================================")
 		iterasi++
 	}
 
 	// var dt_penyakit []respon.Penyakit
 	// var dt_rule []respon.Gejala
 	// fmt.Println(len(dt_penyakit))
-	fmt.Println(dt_json)
+	// fmt.Println(hasil_combine)
+	// getdt := &respon.Response{}
+	// getdt.Status = 200
+	// getdt.Message = "Sukses"
+	// getdt.Data = make([]respon.Hasil_hitung, 0)
+	// for key, value := range hasil_combine {
+	// 	fmt.Println(key, value)
+	// 	getdt.Data = append(getdt.Data, value)
+	// }
+	var hitung []respon.Hasil_hitung
+	for key, value := range hasil_combine {
+		var i respon.Hasil_hitung
+		i.Nama_penyakit = key
+		i.Hasil_perhitungan = value
+		hitung = append(hitung, i)
+	}
+	respon.MessageResponse(w, "Sukses", hitung, 200)
 
 }
