@@ -95,7 +95,7 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// dt_penyakit = append(dt_penyakit, pnykt)
-		sql2 := `select spk_anemia_gejala_penyakit.nama_gejala, spk_anemia_gejala_penyakit.kode_gejala
+		sql2 := `select spk_anemia_gejala_penyakit.nama_gejala, spk_anemia_gejala_penyakit.kode_gejala, spk_anemia_rule.md
 			from spk_anemia_penyakit
 			join spk_anemia_rule on spk_anemia_rule.Penyakitnya_id = spk_anemia_penyakit.id
 			join spk_anemia_gejala_penyakit on spk_anemia_rule.Gejalanya_id = spk_anemia_gejala_penyakit.id
@@ -103,9 +103,11 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 		rows2, err2 := db.Query(sql2, pnykt.Kode_penyakit)
 		iterasi2 := 0
 		fmt.Println(pnykt.Nama_penyakit)
+
+		var kombin []float32
 		for rows2.Next() {
 			rulenya := respon.Gejala{}
-			err2 = rows2.Scan(&rulenya.Gejala, &rulenya.Kode_gejala)
+			err2 = rows2.Scan(&rulenya.Gejala, &rulenya.Kode_gejala, &rulenya.MD)
 			if err2 != nil {
 				log.Panic(err2)
 			}
@@ -116,12 +118,14 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 			// }
 			for _, value := range dt_json {
 				if value.Kode_gejala == rulenya.Kode_gejala {
-					fmt.Printf("- %v = %v\n", value.Kode_gejala, rulenya.Kode_gejala)
+					fmt.Printf("kode %v : %v x %v = %v\n", rulenya.Kode_gejala, value.Persentase_user, rulenya.MD, value.Persentase_user*rulenya.MD)
+					kombin = append(kombin, value.Persentase_user*rulenya.MD)
 				}
 			}
+
 			iterasi2++
 		}
-
+		fmt.Println(kombin)
 		iterasi++
 	}
 

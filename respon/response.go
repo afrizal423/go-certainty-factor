@@ -19,8 +19,9 @@ type GetAll struct {
 
 type Gejala struct {
 	// Id       int64  `db:"pId"`
-	Kode_gejala string `db:"kode_gejala" json:"kode_gejala"`
-	Gejala      string `db:"nama_gejala" json:"nama_gejala"`
+	Kode_gejala string  `db:"kode_gejala" json:"kode_gejala"`
+	Gejala      string  `db:"nama_gejala" json:"nama_gejala"`
+	MD          float32 `db:"md" json:"md"`
 }
 
 type Penyakit struct {
