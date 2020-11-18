@@ -9,7 +9,8 @@ import (
 type Response struct {
 	Status int         `json:"status"`
 	Pesan  string      `json:"pesan"`
-	Data   interface{} `json:"data"`
+	Data   interface{} `json:"list_penyakit"`
+	Hasil  interface{} `json:"hasil_akhir"`
 }
 
 type GetAll struct {
@@ -53,11 +54,12 @@ func ErrorResponse(w http.ResponseWriter, status int, err error) {
 	}
 }
 
-func MessageResponse(w http.ResponseWriter, message string, data interface{}, status int) {
+func MessageResponse(w http.ResponseWriter, message string, data interface{}, data2 interface{}, status int) {
 	res := Response{
 		Status: status,
 		Pesan:  message,
 		Data:   data,
+		Hasil:  data2,
 	}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")

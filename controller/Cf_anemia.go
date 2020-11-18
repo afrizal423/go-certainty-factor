@@ -81,7 +81,6 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 		}
 		// log.Print(GetData)
 		dt_json = append(dt_json, GetData)
-		// fmt.Printf("%v: %v\n", GetData.Kode_gejala, GetData.Persentase_user)
 	}
 	var hasil_combine = make(map[string]float32)
 	// kita buat perulangan untuk mendapatkan values
@@ -94,7 +93,6 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		// dt_penyakit = append(dt_penyakit, pnykt)
 		sql2 := `select spk_anemia_gejala_penyakit.nama_gejala, spk_anemia_gejala_penyakit.kode_gejala, spk_anemia_rule.md
 			from spk_anemia_penyakit
 			join spk_anemia_rule on spk_anemia_rule.Penyakitnya_id = spk_anemia_penyakit.id
@@ -102,7 +100,7 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 			where spk_anemia_penyakit.Kode_penyakit=?`
 		rows2, err2 := db.Query(sql2, pnykt.Kode_penyakit)
 		iterasi2 := 0
-		fmt.Println(pnykt.Nama_penyakit)
+		fmt.Println("Nama Penyakit ", pnykt.Nama_penyakit)
 		fmt.Println("=====================================")
 		var kombin []float32
 		for rows2.Next() {
@@ -111,11 +109,6 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 			if err2 != nil {
 				log.Panic(err2)
 			}
-			// dt_rule = append(dt_rule, rulenya)
-			// fmt.Println(rulenya.Kode_gejala)
-			// if rulenya.Kode_gejala == GetData.Kode_gejala {
-			// 	fmt.Printf("%v: %v = %v\n", GetData.Kode_gejala, GetData.Persentase_user, rulenya.Kode_gejala)
-			// }
 			for _, value := range dt_json {
 				if value.Kode_gejala == rulenya.Kode_gejala {
 					fmt.Printf("kode %v : %v x %v = %v\n", rulenya.Kode_gejala, value.Persentase_user, rulenya.MD, value.Persentase_user*rulenya.MD)
@@ -125,61 +118,48 @@ func HitungCF(w http.ResponseWriter, r *http.Request) {
 
 			iterasi2++
 		}
-		fmt.Println("============Hitung Kombin============")
+		fmt.Println("============Hasil Combine============")
 		var hasilcombin float32 = 0
-		for key, value := range kombin {
+		for key := range kombin {
 			if key == 0 {
-				fmt.Printf("%v %v\n", key, value)
-				fmt.Println(kombin[key+1])
 				hasilcombin = kombin[key] + kombin[key+1]*(1.0-kombin[key])
-				// fmt.Printf("asd %v", hasilcombin)
+				// fmt.Printf("%v + %v * (1 - %v) = %v \n", kombin[key], kombin[key+1], kombin[key], hasilcombin)
 				if len(kombin)-1 == 1 {
-					// fmt.Println(pnykt.Nama_penyakit)
 					hasil_combine[pnykt.Nama_penyakit] = hasilcombin
-					fmt.Println("stop/last")
+					// fmt.Println("============Hasil Kombin============")
+					fmt.Println("Hasil combin = ", hasilcombin)
 					break
 				}
 			} else {
-				// fmt.Println(key + 1)
-				// fmt.Println(len(kombin))
 				if key+1 == len(kombin) {
-					// fmt.Println(pnykt.Nama_penyakit)
 					hasil_combine[pnykt.Nama_penyakit] = hasilcombin
-					fmt.Println("stop/last")
+					// fmt.Println("============Hasil Kombin============")
+					fmt.Println("Hasil combin = ", hasilcombin)
 					break
 				}
-				// if kombin[key+1] == 0 {
-				// 	break
-				// }
 				hasilcombin = hasilcombin + kombin[key+1]*(1.0-hasilcombin)
-				// fmt.Printf("asd %v", hasilcombin)
+				// fmt.Printf("%v + %v * (1 - %v) = %v \n", hasilcombin, kombin[key+1], hasilcombin, hasilcombin)
 			}
 		}
-		// fmt.Println(hasilcombin)
-		fmt.Println(len(kombin))
+		// fmt.Println(len(kombin))
 		fmt.Println("=====================================")
 		iterasi++
 	}
-
-	// var dt_penyakit []respon.Penyakit
-	// var dt_rule []respon.Gejala
-	// fmt.Println(len(dt_penyakit))
-	// fmt.Println(hasil_combine)
-	// getdt := &respon.Response{}
-	// getdt.Status = 200
-	// getdt.Message = "Sukses"
-	// getdt.Data = make([]respon.Hasil_hitung, 0)
-	// for key, value := range hasil_combine {
-	// 	fmt.Println(key, value)
-	// 	getdt.Data = append(getdt.Data, value)
-	// }
 	var hitung []respon.Hasil_hitung
+	var terbesar respon.Hasil_hitung
+	var tmp float32 = 0
 	for key, value := range hasil_combine {
 		var i respon.Hasil_hitung
 		i.Nama_penyakit = key
 		i.Hasil_perhitungan = value
+		if tmp < value {
+			terbesar.Nama_penyakit = key
+			terbesar.Hasil_perhitungan = value
+			tmp = value
+		}
 		hitung = append(hitung, i)
+
 	}
-	respon.MessageResponse(w, "Sukses", hitung, 200)
+	respon.MessageResponse(w, "Sukses", hitung, terbesar, 200)
 
 }
